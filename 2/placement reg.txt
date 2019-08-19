@@ -1,0 +1,189 @@
+Placement Registration App
+Aim: 
+	To develop an Android Application to register for placement by filling the details of the student
+
+UI Design:
+ 
+
+Program:
+MainActivity.java
+
+package com.example.placementapp;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+public class MainActivity extends Activity implements OnClickListener, OnItemSelectedListener{
+
+	EditText txt1, txt2, txt3, txt4, txt5;
+	Button b1, b2;
+	
+	RadioGroup rg;
+	RadioButton r;
+	
+	Spinner sp;
+	
+	String dept;
+	
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        txt1=(EditText)findViewById(R.id.txtRegNo);
+        txt2=(EditText)findViewById(R.id.txtName);
+        txt3=(EditText)findViewById(R.id.txt10th);
+        txt4=(EditText)findViewById(R.id.txt12th);
+        txt5=(EditText)findViewById(R.id.txtug);
+        
+        b1=(Button)findViewById(R.id.btnSubmit);
+        b2=(Button)findViewById(R.id.btnClear);
+        
+      b1.setOnClickListener(this);
+      b2.setOnClickListener(this);
+        
+      rg=(RadioGroup)findViewById(R.id.radioGroup);
+      
+      sp=(Spinner)findViewById(R.id.sprDepts);
+      sp.setOnItemSelectedListener(this);
+        
+    }
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		DatabaseHandler db = new DatabaseHandler(this);
+		
+		switch(arg0.getId())
+		{
+		case R.id.btnSubmit:
+			int reg=Integer.parseInt(txt1.getText().toString());
+			String n=txt2.getText().toString();
+			int rid=rg.getCheckedRadioButtonId();
+			r=(RadioButton)findViewById(rid);
+			String gen=r.getText().toString();
+			//department
+			float ten=Float.parseFloat(txt3.getText().toString());
+			float twele=Float.parseFloat(txt4.getText().toString());
+			float ug=Float.parseFloat(txt5.getText().toString());
+			//Toast.makeText(getApplicationContext(), "The Values are:\n Reg.no:"+reg+"\nName:"+n+"\nGender:"+gen+"\nDepartment:"+dept+"\n10Tth Mark:"+ten+"\n12th Mark:"+twele+"\nUG Mark:"+ug, Toast.LENGTH_LONG).show();
+			db.insertEntry(reg, n, gen, dept, ten, twele, ug);
+			Toast.makeText(getApplicationContext(), "Record inserted successfully...", Toast.LENGTH_LONG).show();
+			txt1.setText("");
+			txt2.setText("");
+			txt3.setText("");
+			txt4.setText("");
+			txt5.setText("");
+			break;
+		case R.id.btnClear:
+			txt1.setText("");
+			txt2.setText("");
+			txt3.setText("");
+			txt4.setText("");
+			txt5.setText("");
+			break;
+		
+		}
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+			long arg3) {
+		// TODO Auto-generated method stub
+		dept=sp.getSelectedItem().toString();
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
+
+DatabaseHandler.java
+package com.example.placementapp;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DatabaseHandler extends SQLiteOpenHelper{
+
+	private static final int DATABASE_VERSION = 1;
+	
+	private static final String DATABASE_NAME = "Placement";
+	
+	private static final String TABLE_DETAILS = "detail";
+	
+	private static final String KEY_ID = "regno";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_GENDER = "gender";
+    private static final String KEY_DEPT = "dept";
+    private static final String KEY_10TH = "tenthmark";
+    private static final String KEY_12TH = "twlvethmark";
+    private static final String KEY_UG = "ugmark";
+    
+    
+	
+	public DatabaseHandler(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// TODO Auto-generated method stub
+		String cQuery="CREATE TABLE " + TABLE_DETAILS + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_NAME + " TEXT, " + KEY_GENDER + " TEXT, "+ KEY_DEPT + " TEXT, " + KEY_10TH +" REAL, " + KEY_12TH + " REAL, " + KEY_UG + " REAL " + ");";
+	
+		db.execSQL(cQuery);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int arg1, int arg2) {
+		// TODO Auto-generated method stub
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_DETAILS);
+		onCreate(db);
+	}
+
+public void insertEntry(int reg, String nam, String gen, String dept, float tenmark, float twlemark, float ugmark){
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		 
+        ContentValues values = new ContentValues();
+        
+        values.put(KEY_ID, reg); // Dept ID
+        values.put(KEY_NAME, nam); // Dept Name
+        values.put(KEY_GENDER, gen);
+        values.put(KEY_DEPT, dept);
+        values.put(KEY_10TH, tenmark);
+        values.put(KEY_12TH, twlemark);
+        values.put(KEY_UG, ugmark);
+ 
+        // Inserting Row
+        db.insert(TABLE_DETAILS, null, values);
+       
+        db.close(); // Closing database connection
+	}
+}
+
+Output:
+ 
+
+ 
+Database:
+ 
+Result:
+Thus, the Android application for placement registration was done with SQLite database and executed and verified successfully.
